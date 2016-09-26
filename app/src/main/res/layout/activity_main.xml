@@ -12,11 +12,6 @@
     <com.konka.playbutton.PlayButton
         android:layout_width="300dp"
         android:layout_height="300dp"
-        android:background="#ccc"
         android:paddingBottom="40dp"
-        android:paddingLeft="20dp"
-        app:exampleColor="#33b5e5"
-        app:exampleDimension="24sp"
-        app:exampleDrawable="@android:drawable/ic_menu_add"
-        app:exampleString="Hello, PlayButton" />
+        android:paddingLeft="20dp" />
 </RelativeLayout>
