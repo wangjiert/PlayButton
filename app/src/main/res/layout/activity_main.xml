@@ -10,8 +10,10 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.konka.playbutton.MainActivity">
     <com.konka.playbutton.PlayButton
+        android:id="@+id/button"
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:paddingBottom="40dp"
-        android:paddingLeft="20dp" />
+        android:paddingLeft="20dp"
+        android:onClick="click"/>
 </RelativeLayout>
