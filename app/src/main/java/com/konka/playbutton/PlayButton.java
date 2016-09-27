@@ -19,13 +19,19 @@ import android.view.View;
 import android.widget.Button;
 
 public class PlayButton extends Button {
-    AnimatorSet animatorSet = new AnimatorSet();
-    Path path = new Path();
-    Paint paint = new Paint();
-    Paint cleanPaint = new Paint();
-    RectF rectF;
-    float lengthValue = 0.05f;
-    float rotationValue = 0f;
+    private float square3 = 1.732050808f;
+    private boolean loading = true;
+    private AnimatorSet animatorSet = new AnimatorSet();
+    private Path path = new Path();
+    private Paint paint = new Paint();
+    //Paint cleanPaint = new Paint();
+    private RectF rectF;
+    private float lengthValue = 0.05f;
+    private float rotationValue = 0f;
+    private float lineLengthValue = 0.1f;
+    private float xCoordinate = 126.794919243f;
+    private float yCoordinate = 200f;
+    private float moveDistance = 0f;
     public PlayButton(Context context) {
         super(context);
         init(null, 0);
@@ -43,7 +49,7 @@ public class PlayButton extends Button {
 
     private void init(AttributeSet attrs, int defStyle) {
         //cleanPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-        cleanPaint.setColor(getDrawingCacheBackgroundColor());
+        //cleanPaint.setColor(getDrawingCacheBackgroundColor());
         rectF = new RectF(100, 100, 600 - 100, 600 - 100);
         paint.setColor(Color.BLUE);
         paint.setAntiAlias(true);
@@ -55,16 +61,44 @@ public class PlayButton extends Button {
         lengthAnimator.setDuration(4000);
         ObjectAnimator rotationAnimator = ObjectAnimator.ofFloat(this, "rotationValue", 360f);
         rotationAnimator.setDuration(4000);
+        rotationAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                loading = false;
+            }
+        });
+        ObjectAnimator lineLengthAnimator = ObjectAnimator.ofFloat(this, "lineLengthValue", 30f);
+        lineLengthAnimator.setDuration(4000);
+        ObjectAnimator moveAnimator = ObjectAnimator.ofFloat(this, "moveDistance", 73.205080757f);
+        moveAnimator.setDuration(4000);
 
         animatorSet.play(lengthAnimator).before(rotationAnimator);
+        animatorSet.play(rotationAnimator).before(lineLengthAnimator);
+        animatorSet.play(lineLengthAnimator).before(moveAnimator);
         animatorSet.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
+                loading = true;
+                moveDistance = 0f;
                 animatorSet.start();
             }
         });
         animatorSet.start();
+    }
+
+    private void setMoveDistance(float moveDistance) {
+        this.moveDistance = moveDistance;
+        if(moveDistance > 100f) {
+
+        }
+        invalidate();
+    }
+
+    private void setLineLengthValue(float lineLengthValue) {
+        this.lineLengthValue = lineLengthValue;
+        invalidate();
     }
 
     private void setLengthValue(float lengthValue){
@@ -86,12 +120,22 @@ public class PlayButton extends Button {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        canvas.drawPaint(cleanPaint);
+        //canvas.drawPaint(cleanPaint);
         int saveCount = canvas.save();
         canvas.rotate(rotationValue, 300f, 300f);
-        path.addArc(rectF, -30f, lengthValue);
-        path.addArc(rectF, 90f, lengthValue);
-        path.addArc(rectF, 210f, lengthValue);
+        if(loading) {
+            path.addArc(rectF, -30f, lengthValue);
+            path.addArc(rectF, 90f, lengthValue);
+            path.addArc(rectF, 210f, lengthValue);
+        }
+        else {
+            path.moveTo(xCoordinate + moveDistance * square3, yCoordinate + moveDistance);
+            path.rLineTo(lineLengthValue * square3, lineLengthValue);
+            path.moveTo(600 - xCoordinate - moveDistance * square3, yCoordinate + moveDistance);
+            path.rLineTo(-lineLengthValue * square3, lineLengthValue);
+            path.moveTo(300f, 500f);
+            path.rLineTo(0.1f, 0.1f);
+        }
         canvas.drawPath(path, paint);
         path.reset();
         super.onDraw(canvas);
